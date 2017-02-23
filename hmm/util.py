@@ -1,7 +1,15 @@
 import math
+import numpy as np
 
+EPS = 1e-4
 ZERO = 1e-12
 LOG_ZERO = math.log(1e-12)
+
+def normalize2d(vec):
+    return (vec.transpose() / vec.sum(axis=1)).transpose()
+
+def normalize1d(vec):
+    return vec / vec.sum()
 
 class LogNum:
     def __init__(self, val=-1):
