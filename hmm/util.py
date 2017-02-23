@@ -11,6 +11,13 @@ def normalize2d(vec):
 def normalize1d(vec):
     return vec / vec.sum()
 
+def log_mul(*arrays):
+    print(arrays)
+    return np.array(arrays).sum(axis=0)
+
+def log_div(*arrays):
+    return arrays[0] - log_mul(*arrays[1:])
+
 class LogNum:
     def __init__(self, val=-1):
         self.val = math.log(val if val > ZERO else ZERO) if val >= 0 else -1
