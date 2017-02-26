@@ -3,8 +3,8 @@ import numpy as np
 from functools import reduce
 
 EPS = 1e-4
-ZERO = 1e-12
-LOG_ZERO = math.log(1e-12)
+ZERO = 1e-300
+LOG_ZERO = math.log(ZERO)
 
 def normalize2d(vec):
     return (vec.transpose() / vec.sum(axis=1)).transpose()
