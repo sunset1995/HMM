@@ -1,3 +1,4 @@
+import math
 import numpy as np
 from . import util
 
@@ -13,9 +14,6 @@ class DiscreteHMM:
         self.log_B = np.log(util.normalize2d(np.random.rand(self.N, self.M)))
         self.log_pi = np.log(util.normalize1d(np.random.rand(self.N)))
 
-    def forward(self, obs):
-        return np.exp(self.__forward(obs))
-
     def __forward(self, obs):
         # Return alpha via forward algorithm
         # All coculations and results are in log space
@@ -25,6 +23,13 @@ class DiscreteHMM:
             for j in range(self.N):
                 alpha[t][j] = util.log_mul(util.log_sum(*util.log_vec_mul(self.log_A[:, j], alpha[t-1])), self.log_B[j, obs[t]])
         return alpha
+
+    def __backward(self, obs):
+        beta = np.full((len(obs), self.N), math.log(1.0), dtype=np.float64)
+        for t in range(len(obs)-2, -1, -1):
+            for i in range(self.N):
+                beta[t][i] = util.log_sum(*util.log_vec_mul(self.log_A[i, :], self.log_B[:, obs[t+1]], beta[t+1]))
+        return beta
 
     def show_model(self):
         print('A: Transition probability'.center(70, '-'))
