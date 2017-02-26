@@ -19,7 +19,7 @@ def log_vec_mul(*vec_arrays):
     return np.sum(vec_arrays, axis=0)
 
 def log_vec_mul_c(array, c):
-    return arrays + c
+    return array + c
 
 def log_div(*arrays):
     return arrays[0] - log_mul(*arrays[1:])
