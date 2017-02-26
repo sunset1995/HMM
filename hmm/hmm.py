@@ -38,6 +38,13 @@ class DiscreteHMM:
             gamma[t] = util.log_vec_div_c(gamma[t], util.log_sum(*gamma[t]))
         return gamma
 
+    def __xi_t(self, t, alpha, beta, obs):
+        xi_t = np.full((self.N, self.N), util.LOG_ZERO, dtype=np.float64)
+        for i in range(self.N):
+            xi_t[i] = util.log_vec_mul_c(util.log_vec_mul(self.log_A[i, :], self.log_B[:, obs[t+1]], beta[t+1, :]), alpha[t][i])
+        xi_t = util.log_vec_div_c(xi_t, util.log_sum(*xi_t.reshape(xi_t.size)))
+        return xi_t
+
     def show_model(self):
         print('A: Transition probability'.center(70, '-'))
         print(np.exp(self.log_A))
