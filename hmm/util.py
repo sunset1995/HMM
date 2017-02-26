@@ -13,11 +13,16 @@ def normalize1d(vec):
     return vec / vec.sum()
 
 def log_mul(*arrays):
-    print(arrays)
     return np.array(arrays).sum(axis=0)
+
+def log_vec_mul(*vec_arrays):
+    return np.sum(vec_arrays, axis=0)
 
 def log_div(*arrays):
     return arrays[0] - log_mul(*arrays[1:])
+
+def log_vec_div(*vec_arrays):
+    return vec_arrays[0] - log_vec_mul(*vec_arrays[1:])
 
 def log_add(*arrays):
     a = max(arrays[0], arrays[1])
