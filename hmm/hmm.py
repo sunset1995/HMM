@@ -167,7 +167,7 @@ class DiscreteHMM:
             'viterby': list(self.__viterby[np.argmax(self.__log_p_vit)]),
         }
 
-    def train(self, obs_seq, itnum=1000, eps=0.00001, verbose=0):
+    def train(self, obs_seq, itnum=100, eps=0.01, verbose=0):
         self.__check_obs_seq(obs_seq)
         for _ in range(itnum):
             delta = self.__optimize_model(obs_seq)
