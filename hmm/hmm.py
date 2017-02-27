@@ -151,7 +151,7 @@ class DiscreteHMM:
 
             # Coculate best explanation via viterby algorithm
             if len(self.__obs_seq) == 0:
-                self.__viterby = list([] for i in range(self.N))
+                self.__viterby = list([i] for i in range(self.N))
                 self.__log_p_vit = util.log_mul(self.__log_p_vit, self.log_B[:, obs])
             else:
                 best_prev = [np.argmax(util.log_vec_mul(self.__log_p_vit, self.log_A[:, i])) for i in range(self.N)]
