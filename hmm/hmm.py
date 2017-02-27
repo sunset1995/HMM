@@ -126,7 +126,6 @@ class DiscreteHMM:
             and abs(np.sum(self.pi) - 1.0) < util.EPS
 
     def given(self, obs_seq):
-        '''Return probability distribution of Pr(qt=Si | O[0:])'''
         if type(obs_seq) != tuple:
             obs_seq = (obs_seq, )
         self.__check_obs_seq(obs_seq)
@@ -137,7 +136,6 @@ class DiscreteHMM:
         return self.given_more(obs_seq)
 
     def given_more(self, obs_seq):
-        '''Return argmax_q[0:] Pr(O[0:] | q[0:])'''
         if type(obs_seq) != tuple:
             obs_seq = (obs_seq, )
         self.__check_obs_seq(obs_seq)
