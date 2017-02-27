@@ -6,6 +6,7 @@ class DiscreteHMM:
     def __init__(self, N, M, A=None, B=None, pi=None):
         self.N = N
         self.M = M
+        self.__obs_seq = []
 
         if A is not None:
             self.A = np.array(A)
@@ -30,6 +31,10 @@ class DiscreteHMM:
         assert(self.B.shape == (N, M, ))
         assert(self.pi.shape == (N, ))
         assert(self.check_model())
+
+    def __check_obs_seq(self, obs_seq):
+        for obs in obs_seq:
+            assert(type(obs) == int and obs >= 0 and obs < self.M)
 
     def __forward(self, obs):
         # Return alpha via forward algorithm
@@ -117,9 +122,20 @@ class DiscreteHMM:
             and abs(np.sum(self.B) - self.N) < util.EPS \
             and abs(np.sum(self.pi) - 1.0) < util.EPS
 
-    def train(self, obs, itnum=1000, eps=0.00001, verbose=0):
+    def given(self, obs_seq):
+        '''Return probability distribution of Pr(qt=Si | O[0:])'''
+        self.__check_obs_seq(obs_seq)
+        pass
+
+    def given_more(self, obs_seq):
+        '''Return argmax_q[0:] Pr(O[0:] | q[0:])'''
+        self.__check_obs_seq(obs_seq)
+        pass
+
+    def train(self, obs_seq, itnum=1000, eps=0.00001, verbose=0):
+        self.__check_obs_seq(obs_seq)
         for _ in range(itnum):
-            delta = self.__optimize_model(obs)
+            delta = self.__optimize_model(obs_seq)
             
             if verbose > 0:
                 print('itnum %5d : delta %f' % (_+1, delta))
