@@ -126,8 +126,6 @@ class DiscreteHMM:
             and abs(np.sum(self.pi) - 1.0) < util.EPS
 
     def given(self, obs_seq):
-        if type(obs_seq) != tuple:
-            obs_seq = (obs_seq, )
         self.__check_obs_seq(obs_seq)
         self.__obs_seq = []
         self.__viterby = []
@@ -136,8 +134,6 @@ class DiscreteHMM:
         return self.given_more(obs_seq)
 
     def given_more(self, obs_seq):
-        if type(obs_seq) != tuple:
-            obs_seq = (obs_seq, )
         self.__check_obs_seq(obs_seq)
         if self.__obs_seq is None:
             return self.given(obs_seq)
