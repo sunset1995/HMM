@@ -1,3 +1,4 @@
+import os
 from hmm.hmm import DiscreteHMM
 
 # Mapping input to variable's id
@@ -17,7 +18,7 @@ observation_var = {
 target = []
 obs_seq = []
 
-with open('input.txt') as f:
+with open(os.path.join(os.path.dirname(__file__), 'input.txt')) as f:
     for line in f:
         hidden, observe = line.strip().split(',')
         target.append(hidden_var[hidden])
