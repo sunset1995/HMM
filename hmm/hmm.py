@@ -10,9 +10,12 @@ class DiscreteHMM:
 
     def __random_init_model(self):
         # Random assign value
-        self.log_A = np.log(util.normalize2d(np.random.rand(self.N, self.N)))
-        self.log_B = np.log(util.normalize2d(np.random.rand(self.N, self.M)))
-        self.log_pi = np.log(util.normalize1d(np.random.rand(self.N)))
+        self.A = util.normalize2d(np.random.rand(self.N, self.N))
+        self.B = util.normalize2d(np.random.rand(self.N, self.M))
+        self.pi = util.normalize1d(np.random.rand(self.N))
+        self.log_A = np.log(self.A)
+        self.log_B = np.log(self.B)
+        self.log_pi = np.log(self.pi)
 
     def __forward(self, obs):
         # Return alpha via forward algorithm
@@ -35,28 +38,79 @@ class DiscreteHMM:
         gamma = np.full((len(alpha), self.N), util.LOG_ZERO, dtype=np.float64)
         for t in range(len(alpha)):
             gamma[t] = util.log_vec_mul(alpha[t], beta[t])
-            gamma[t] = util.log_vec_div_c(gamma[t], util.log_sum(*gamma[t]))
+            gamma[t] = util.log_vec_div(gamma[t], util.log_sum(*gamma[t]))
         return gamma
 
     def __xi_t(self, t, alpha, beta, obs):
         xi_t = np.full((self.N, self.N), util.LOG_ZERO, dtype=np.float64)
         for i in range(self.N):
-            xi_t[i] = util.log_vec_mul_c(util.log_vec_mul(self.log_A[i, :], self.log_B[:, obs[t+1]], beta[t+1, :]), alpha[t][i])
-        xi_t = util.log_vec_div_c(xi_t, util.log_sum(*xi_t.reshape(xi_t.size)))
+            xi_t[i] = util.log_vec_mul(util.log_vec_mul(self.log_A[i, :], self.log_B[:, obs[t+1]], beta[t+1, :]), alpha[t][i])
+        xi_t = util.log_vec_div(xi_t, util.log_sum(*xi_t.reshape(xi_t.size)))
         return xi_t
+
+    def __optimize_model(self, obs):
+        alpha = self.__forward(obs)
+        beta = self.__backward(obs)
+        gamma = self.__forward_backward(alpha, beta)
+
+        A_son = np.full((self.N, self.N), util.LOG_ZERO, dtype=np.float64)
+        A_mom = np.full((self.N), util.LOG_ZERO, dtype=np.float64)
+        B_son = np.full((self.N, self.M), util.LOG_ZERO, dtype=np.float64)
+        B_mom = np.full((self.N), util.LOG_ZERO, dtype=np.float64)
+        n_pi = np.full((self.N), util.LOG_ZERO, dtype=np.float64)
+
+        # Count transition probability
+        for t in range(len(obs)-1):
+            xi_t = self.__xi_t(t, alpha, beta, obs)
+            A_son = util.log_vec_add(A_son, xi_t)
+            A_mom = util.log_vec_add(A_mom, gamma[t])
+
+        # Count emmision probability
+        for t in range(len(obs)):
+            B_son[:, obs[t]] = util.log_vec_add(B_son[:, obs[t]], gamma[t])
+            B_mom = util.log_vec_add(B_mom, gamma[t])
+
+        # Assign new better model
+        self.log_A = util.log_vec_div(A_son.T, A_mom).T
+        self.log_B = util.log_vec_div(B_son.T, B_mom).T
+        self.log_pi = gamma[0]
+        A = np.exp(self.log_A)
+        B = np.exp(self.log_B)
+        pi = np.exp(self.log_pi)
+
+        delta = np.sum(np.fabs(np.array((
+            *(A-self.A).flatten(),
+            *(B-self.B).flatten(),
+            *(pi-self.pi)))))
+
+        self.A = A
+        self.B = B
+        self.pi = pi
+
+        return delta
+
 
     def show_model(self):
         print('A: Transition probability'.center(70, '-'))
-        print(np.exp(self.log_A))
+        print(self.A)
         print('B: Emission probability'.center(70, '-'))
-        print(np.exp(self.log_B))
+        print(self.B)
         print('pi: initital state distribution'.center(70, '-'))
-        print(np.exp(self.log_pi))
+        print(self.pi)
 
     def check_model(self):
-        return abs(np.sum(np.exp(self.log_A)) - self.N) < util.EPS \
-            and abs(np.sum(np.exp(self.log_B)) - self.N) < util.EPS \
-            and abs(np.sum(np.exp(self.log_pi)) - 1.0) < util.EPS
+        return abs(np.sum(self.A) - self.N) < util.EPS \
+            and abs(np.sum(self.B) - self.N) < util.EPS \
+            and abs(np.sum(self.pi) - 1.0) < util.EPS
 
-    def train(self, obs):
-        pass
+    def train(self, obs, itnum=1000, eps=0.00001, verbose=0):
+        for _ in range(itnum):
+            delta = self.__optimize_model(obs)
+            
+            if verbose > 0:
+                print('itnum %5d : delta %f' % (_+1, delta))
+            elif verbose > 1:
+                self.show_model()
+
+            if abs(delta) < eps:
+                break
