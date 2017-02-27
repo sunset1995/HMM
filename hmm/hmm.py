@@ -147,18 +147,29 @@ class DiscreteHMM:
             if len(self.__obs_seq) == 0:
                 self.__log_p_fwd = util.log_mul(self.__log_p_fwd, self.log_B[:, obs])
             else:
-                self.__log_p_fwd = np.array(
-                    [util.log_mul(util.log_sum(*util.log_vec_mul(self.__log_p_fwd, self.log_A[:, i])), self.log_B[i, obs])
+                self.__log_p_fwd = np.array([
+                    util.log_mul(util.log_sum(*util.log_vec_mul(self.__log_p_fwd, self.log_A[:, i])), self.log_B[i, obs])
                         for i in range(self.N)])
             # Normalize
             self.__log_p_fwd = util.log_vec_div(self.__log_p_fwd, util.log_sum(*self.__log_p_fwd))
 
             # Coculate best explanation via viterby algorithm
-            pass
+            if len(self.__obs_seq) == 0:
+                self.__viterby = list([] for i in range(self.N))
+                self.__log_p_vit = util.log_mul(self.__log_p_vit, self.log_B[:, obs])
+            else:
+                best_prev = [np.argmax(util.log_vec_mul(self.__log_p_vit, self.log_A[:, i])) for i in range(self.N)]
+                self.__viterby = [[*self.__viterby[best_prev[i]], i] for i in range(self.N)]
+                self.__log_p_vit = np.array([
+                    util.log_mul(self.__log_p_vit[best_prev[i]], self.log_A[best_prev[i], i], self.log_B[i, obs])
+                        for i in range(self.N)])
 
             self.__obs_seq.append(obs)
 
-        return np.exp(self.__log_p_fwd)
+        return {
+            'forward': np.exp(self.__log_p_fwd),
+            'viterby': list(self.__viterby[np.argmax(self.__log_p_vit)]),
+        }
 
     def train(self, obs_seq, itnum=1000, eps=0.00001, verbose=0):
         self.__check_obs_seq(obs_seq)
