@@ -3,19 +3,33 @@ import numpy as np
 from . import util
 
 class DiscreteHMM:
-    def __init__(self, N, M):
+    def __init__(self, N, M, A=None, B=None, pi=None):
         self.N = N
         self.M = M
-        self.__random_init_model()
 
-    def __random_init_model(self):
-        # Random assign value
-        self.A = util.normalize2d(np.random.rand(self.N, self.N))
-        self.B = util.normalize2d(np.random.rand(self.N, self.M))
-        self.pi = util.normalize1d(np.random.rand(self.N))
+        if A is not None:
+            self.A = np.array(A)
+        else:
+            self.A = util.normalize2d(np.random.rand(self.N, self.N))
+
+        if B is not None:
+            self.B = np.array(B)
+        else:
+            self.B = util.normalize2d(np.random.rand(self.N, self.M))
+
+        if pi is not None:
+            self.pi = np.array(pi)
+        else:
+            self.pi = util.normalize1d(np.random.rand(self.N))
+
         self.log_A = np.log(self.A)
         self.log_B = np.log(self.B)
         self.log_pi = np.log(self.pi)
+
+        assert(self.A.shape == (N, N, ))
+        assert(self.B.shape == (N, M, ))
+        assert(self.pi.shape == (N, ))
+        assert(self.check_model())
 
     def __forward(self, obs):
         # Return alpha via forward algorithm
