@@ -6,7 +6,10 @@ class DiscreteHMM:
     def __init__(self, N, M, A=None, B=None, pi=None):
         self.N = N
         self.M = M
-        self.__obs_seq = []
+        self.__obs_seq = None
+        self.__viterby = None
+        self.__log_p_vit = None
+        self.__log_p_fwd = None
 
         if A is not None:
             self.A = np.array(A)
@@ -124,13 +127,40 @@ class DiscreteHMM:
 
     def given(self, obs_seq):
         '''Return probability distribution of Pr(qt=Si | O[0:])'''
+        if type(obs_seq) != tuple:
+            obs_seq = (obs_seq, )
         self.__check_obs_seq(obs_seq)
-        pass
+        self.__obs_seq = []
+        self.__viterby = []
+        self.__log_p_vit = np.array(self.log_pi)
+        self.__log_p_fwd = np.array(self.log_pi)
+        return self.given_more(obs_seq)
 
     def given_more(self, obs_seq):
         '''Return argmax_q[0:] Pr(O[0:] | q[0:])'''
+        if type(obs_seq) != tuple:
+            obs_seq = (obs_seq, )
         self.__check_obs_seq(obs_seq)
-        pass
+        if self.__obs_seq is None:
+            return self.given(obs_seq)
+        
+        for obs in obs_seq:
+            # Coculate probability distribution via forward algorithm
+            if len(self.__obs_seq) == 0:
+                self.__log_p_fwd = util.log_mul(self.__log_p_fwd, self.log_B[:, obs])
+            else:
+                self.__log_p_fwd = np.array(
+                    [util.log_mul(util.log_sum(*util.log_vec_mul(self.__log_p_fwd, self.log_A[:, i])), self.log_B[i, obs])
+                        for i in range(self.N)])
+            # Normalize
+            self.__log_p_fwd = util.log_vec_div(self.__log_p_fwd, util.log_sum(*self.__log_p_fwd))
+
+            # Coculate best explanation via viterby algorithm
+            pass
+
+            self.__obs_seq.append(obs)
+
+        return np.exp(self.__log_p_fwd)
 
     def train(self, obs_seq, itnum=1000, eps=0.00001, verbose=0):
         self.__check_obs_seq(obs_seq)
