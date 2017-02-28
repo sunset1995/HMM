@@ -113,6 +113,7 @@ class DiscreteHMM:
 
 
     def show_model(self):
+        np.set_printoptions(precision=4, suppress=True)
         print('A: Transition probability'.center(70, '-'))
         print(self.A)
         print('B: Emission probability'.center(70, '-'))
