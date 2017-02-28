@@ -174,7 +174,7 @@ class DiscreteHMM:
             
             if verbose > 0:
                 print('itnum %5d : delta %f' % (_+1, delta))
-            elif verbose > 1:
+            if verbose > 1:
                 self.show_model()
 
             if abs(delta) < eps:
