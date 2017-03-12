@@ -12,19 +12,24 @@ class DiscreteHMM:
         self.__log_p_fwd = None
 
         if A is not None:
-            self.A = np.array(A)
+            self.A = np.array(A, dtype=np.float64)
         else:
             self.A = util.normalize2d(np.random.rand(self.N, self.N))
 
         if B is not None:
-            self.B = np.array(B)
+            self.B = np.array(B, dtype=np.float64)
         else:
             self.B = util.normalize2d(np.random.rand(self.N, self.M))
 
         if pi is not None:
-            self.pi = np.array(pi)
+            self.pi = np.array(pi, dtype=np.float64)
         else:
             self.pi = util.normalize1d(np.random.rand(self.N))
+
+        # Remove zero
+        self.A += ((self.A < util.ZERO) * util.ZERO).astype(np.float64)
+        self.B += ((self.B < util.ZERO) * util.ZERO).astype(np.float64)
+        self.pi += ((self.pi < util.ZERO) * util.ZERO).astype(np.float64)
 
         self.log_A = np.log(self.A)
         self.log_B = np.log(self.B)
@@ -122,9 +127,9 @@ class DiscreteHMM:
         print(self.pi)
 
     def check_model(self):
-        return abs(np.sum(self.A) - self.N) < util.EPS \
-            and abs(np.sum(self.B) - self.N) < util.EPS \
-            and abs(np.sum(self.pi) - 1.0) < util.EPS
+        return abs(self.A.sum() - self.N) < util.EPS \
+            and abs(self.B.sum() - self.N) < util.EPS \
+            and abs(self.pi.sum() - 1.0) < util.EPS
 
     def given(self, obs_seq):
         self.__check_obs_seq(obs_seq)
