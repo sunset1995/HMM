@@ -58,14 +58,18 @@ for i in range(test_x.shape[0]):
         print('forward total correct rate:', (p_correct_num / p_total_num).mean())
         print('=====================================================')
     
-    #print(p_path)
     #print(v_path)
+    #print(p_path)
     #print('viterby guess:', v_guess)
     #print('forward guess:', p_guess)
     #print('target       :', test_y[i])
     #print('========================================')
 
-print('correct rate each class:')
-print(correct_num / total_num)
-print('total correct rate:', (correct_num / total_num).mean())
-
+print('test %d datas' % i)
+print('viterby correct rate each class:')
+print(v_correct_num / v_total_num)
+print('forward correct rate each class:')
+print(p_correct_num / p_total_num)
+print('viterby total correct rate:', (v_correct_num / v_total_num).mean())
+print('forward total correct rate:', (p_correct_num / p_total_num).mean())
+print('=====================================================')
