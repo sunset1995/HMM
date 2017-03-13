@@ -31,18 +31,14 @@ for i in range(test_x.shape[0]):
     # Viterbi guessing
     v_cnt = np.full((11), 0, dtype=int)
     for hidden_state in v_path:
-        if hidden_state == N-1:
-            v_cnt[10] += 1
-        else:
+        if hidden_state != N-1:
             v_cnt[hidden_state%10] += 1
     v_guess = np.argmax(v_cnt)
 
     # Forward guessing
     p_cnt = np.full((11), 0, dtype=int)
     for hidden_state in p_path:
-        if hidden_state == N-1:
-            p_cnt[10] += 1
-        else:
+        if hidden_state != N-1:
             p_cnt[hidden_state%10] += 1
     p_guess = np.argmax(p_cnt)
 
