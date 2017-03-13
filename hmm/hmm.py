@@ -42,7 +42,7 @@ class DiscreteHMM:
 
     def __check_obs_seq(self, obs_seq):
         for obs in obs_seq:
-            assert(type(obs) == int and obs >= 0 and obs < self.M)
+            assert(obs >= 0 and obs < self.M)
 
     def __forward(self, obs):
         # Return alpha via forward algorithm
