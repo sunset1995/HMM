@@ -17,7 +17,7 @@ correct_num = np.full((10), 0, dtype=np.int32)
 total_num = np.full((10), 0, dtype=np.int32)
 for i in range(test_x.shape[0]):
     x = test_x[i].reshape((28, 28))
-    obs_seq = [data_proc.encode_col(x.T[i]) for i in range(28)]
+    obs_seq = [data_proc.encode_col_k_means(x.T[i]) for i in range(28)]
     v_path = hmm.given(obs_seq)['viterby']
     
     cnt = np.full((11), 0, dtype=int)
