@@ -8,10 +8,10 @@ train_x, _, _, _ = data_proc.read_mnist()
 points = set()
 for i in range(train_x.shape[0]):
     x = train_x[i].reshape((28, 28))
-    for j in range(28):
-        points.add(tuple(x.T[j]))
+    for j in range(1, 28):
+        points.add(tuple(x.T[j-1:j+1].flat))
 
-points.remove((0, )*28)
+points.remove((0, )*56)
 points = [np.array(p) for p in points]
 print(len(points))
 
@@ -33,7 +33,7 @@ def update_member():
     global members_num
     global converge
     last_num = members_num
-    members_sum = np.full((M-1, 28), 0, dtype=np.int64)
+    members_sum = np.full((M-1, 56), 0, dtype=np.int64)
     members_num = np.full((M-1), 0, dtype=np.int64)
     for p in points:
         closest = np.argmin(((p-centers)**2).sum(axis=1))
@@ -56,7 +56,7 @@ for i in range(1000):
     # Print temporary result at each iteration
     for c in centers:
         print(tuple(c))
-    print((0, ) * 28)
+    print((0, ) * 56)
     print(list(members_num))
     print('=============================================')
     if converge:

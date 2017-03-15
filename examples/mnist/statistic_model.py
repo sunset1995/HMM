@@ -22,15 +22,15 @@ for i in range(train_x.shape[0]):
     ms_pos = (s_pos + m_pos) // 2
     me_pos = (e_pos + m_pos) // 2
     rng = (
-    	range(s_pos, ms_pos),
-    	range(ms_pos, m_pos),
-    	range(m_pos, me_pos),
-    	range(me_pos, e_pos+1),
+        range(s_pos, ms_pos),
+        range(ms_pos, m_pos),
+        range(m_pos, me_pos),
+        range(me_pos, e_pos),
     )
 
     for j in range(4):
         for k in rng[j]:
-            obs = data_proc.encode_col_k_means(x.T[k])
+            obs = data_proc.encode_col_k_means(x.T[k:k+2].flat)
             cnt[j*10+y][obs] += 1
 
 total = cnt.sum(axis=1)
@@ -38,7 +38,5 @@ emission_p = np.array([[cnt[i,j] / total[i] for j in range(M)] for i in range(N-
 
 print('(')
 for row in emission_p:
-    print('    (')
-    print('        %s' % (',  '.join(map(str, row))))
-    print('    ),')
+    print('        (%s),' % (',  '.join(map(str, row))))
 print(')')

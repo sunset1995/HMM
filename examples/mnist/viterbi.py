@@ -19,7 +19,7 @@ p_correct_num = np.full((10), 0, dtype=np.int32)
 p_total_num = np.full((10), 0, dtype=np.int32)
 for i in range(test_x.shape[0]):
     x = test_x[i].reshape((28, 28))
-    obs_seq = [data_proc.encode_col_k_means(x.T[i]) for i in range(28)]
+    obs_seq = [data_proc.encode_col_k_means(x.T[i-1:i+1].flat) for i in range(1, 28)]
 
     path = [hmm.given(obs_seq[0:1])]
     for j in range(1, 28):
@@ -58,12 +58,14 @@ for i in range(test_x.shape[0]):
         print('forward total correct rate:', (p_correct_num / p_total_num).mean())
         print('=====================================================')
     
-    print(v_path)
-    print(p_path)
-    print('viterby guess:', v_guess)
-    print('forward guess:', p_guess)
-    print('target       :', test_y[i])
-    print('========================================')
+    if test_y[i] != v_guess or test_y[i] != p_guess:
+        pass
+        print(v_path)
+        print(p_path)
+        print('viterby guess:', v_guess)
+        print('forward guess:', p_guess)
+        print('target       :', test_y[i])
+        print('========================================')
 
 print('test %d datas' % i)
 print('viterby correct rate each class:')
