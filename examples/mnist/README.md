@@ -6,8 +6,13 @@ First thing first, please download and extract the data files - `train-images-id
 
 ## Result
 ```
-correct rate each class:
-[ 0.86938776  0.77268722  0.75872093  0.70891089  0.86863544  0.66591928
-  0.83716075  0.80350195  0.73203285  0.79583746]
-total correct rate: 0.781279453562
+test 9900 datas
+viterby correct rate each class:
+[ 0.90092879  0.93499555  0.78787879  0.828       0.91340206  0.66252822
+  0.88160677  0.83677483  0.69637306  0.8493014 ]
+forward correct rate each class:
+[ 0.8998968   0.95903829  0.74780059  0.807       0.91237113  0.64785553
+  0.87420719  0.83087512  0.72227979  0.83133733]
+viterby total correct rate: 0.82917894541
+forward total correct rate: 0.823266177129
 ```
