@@ -1,6 +1,18 @@
+import sys
 import random
 import numpy as np
 import data_proc
+
+if len(sys.argv) != 2:
+    print('Please specify output file name')
+    exit(0)
+
+try:
+    with open(sys.argv[1], 'w') as f:
+        pass
+except:
+    print('Error while opening the output file')
+    sys.exit(0)
 
 train_x, _, _, _ = data_proc.read_mnist()
 
@@ -54,11 +66,12 @@ for i in range(1000):
     update_center()
     
     # Print temporary result at each iteration
-    for c in centers:
-        print(tuple(c))
-    print((0, ) * 56)
-    print(list(members_num))
-    print('=============================================')
-    if converge:
-        print('converge')
-        break
+    with open(sys.argv[1], 'w') as f:
+        print('iteration %d' % (i), file=f)
+        for c in centers:
+            print(tuple(c), file=f)
+        print((0, ) * 56, file=f)
+        print(list(members_num), file=f)
+        if converge:
+            print('converge', file=f)
+            break
